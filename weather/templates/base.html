@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Weather Dashboard{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Weather Data Analyzer</p>
+                <h1 class="app-title">Forecast Dashboard</h1>
+            </div>
+            <form class="search-form" action="{{ url_for('search') }}" method="get">
+                <input
+                    type="text"
+                    name="city"
+                    value="{{ city or '' }}"
+                    placeholder="Search city"
+                    aria-label="Search city"
+                >
+                <button type="submit">Update City</button>
+            </form>
+        </header>
+
+        <nav class="nav-bar">
+            <a href="{{ url_for('index', city=city) }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('history', city=city) }}" class="{% if request.endpoint == 'history' %}active{% endif %}">History</a>
+            <a href="{{ url_for('forecast', city=city) }}" class="{% if request.endpoint == 'forecast' %}active{% endif %}">Forecast</a>
+        </nav>
+
+        {% if available_cities %}
+        <section class="city-strip">
+            <span>Stored cities:</span>
+            {% for stored_city in available_cities %}
+            <a href="{{ url_for(request.endpoint, city=stored_city) }}">{{ stored_city }}</a>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <section class="flash-list">
+                {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+        {% endwith %}
+
+        {% if error_message %}
+        <section class="flash-list">
+            <div class="flash error">{{ error_message }}</div>
+        </section>
+        {% endif %}
+
+        <main class="page-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

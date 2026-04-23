@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}History | Weather Analyzer{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Historical Records</p>
+            <h2>{{ city }}</h2>
+            <p class="muted">{{ total_records }} stored reading{% if total_records != 1 %}s{% endif %}</p>
+        </div>
+    </div>
+
+    {% if records %}
+    <div class="table-wrap">
+        <table id="historyTable" class="history-table">
+            <thead>
+                <tr>
+                    <th data-sort="number">#</th>
+                    <th data-sort="string">City</th>
+                    <th data-sort="number">Temp (C)</th>
+                    <th data-sort="number">Humidity (%)</th>
+                    <th data-sort="number">Wind (m/s)</th>
+                    <th data-sort="string">Condition</th>
+                    <th data-sort="string">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.id }}</td>
+                    <td>{{ record.city }}</td>
+                    <td class="temp-cell {% if record.temperature < 10 %}cold{% elif record.temperature > 25 %}hot{% else %}mild{% endif %}">
+                        {{ "%.1f"|format(record.temperature) }}
+                    </td>
+                    <td>{{ record.humidity }}</td>
+                    <td>{{ "%.1f"|format(record.wind_speed) }}</td>
+                    <td>{{ record.description }}</td>
+                    <td>{{ record.display_timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <a class="{% if page == 1 %}disabled{% endif %}" href="{{ url_for('history', city=city, page=page-1 if page > 1 else 1) }}">Previous</a>
+        <span>Page {{ page }} of {{ total_pages }}</span>
+        <a class="{% if page == total_pages %}disabled{% endif %}" href="{{ url_for('history', city=city, page=page+1 if page < total_pages else total_pages) }}">Next</a>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No stored weather history</h3>
+        <p>Search for {{ city }} on the dashboard to save records, then come back here.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

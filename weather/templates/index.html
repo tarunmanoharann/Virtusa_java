@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Weather Analyzer{% endblock %}
+
+{% block content %}
+<section class="hero-grid">
+    <article class="panel current-panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Current Conditions</p>
+                <h2>{{ city }}</h2>
+                <p class="muted">Last updated: {{ updated_at }}</p>
+            </div>
+            <div class="weather-icon {{ icon_class }}">
+                <span class="sun-core"></span>
+                <span class="cloud cloud-one"></span>
+                <span class="cloud cloud-two"></span>
+                <span class="rain-drop drop-one"></span>
+                <span class="rain-drop drop-two"></span>
+                <span class="rain-drop drop-three"></span>
+            </div>
+        </div>
+
+        {% if current_weather %}
+        <div class="card-grid">
+            <div class="metric-card">
+                <span>Temperature</span>
+                <strong>{{ "%.1f"|format(current_weather.temperature) }} C</strong>
+            </div>
+            <div class="metric-card">
+                <span>Humidity</span>
+                <strong>{{ current_weather.humidity }}%</strong>
+            </div>
+            <div class="metric-card">
+                <span>Wind Speed</span>
+                <strong>{{ "%.1f"|format(current_weather.wind_speed) }} m/s</strong>
+            </div>
+            <div class="metric-card">
+                <span>Feels Like</span>
+                <strong>{{ "%.1f"|format(current_weather.feels_like) }} C</strong>
+            </div>
+        </div>
+        <p class="condition-line">{{ current_weather.description }}</p>
+        {% else %}
+        <div class="empty-state">
+            <h3>No live weather available</h3>
+            <p>Search for a city after adding your API key to load the latest conditions.</p>
+        </div>
+        {% endif %}
+    </article>
+
+    <article class="panel insights-panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Analysis Snapshot</p>
+                <h2>Last 7 Days</h2>
+            </div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-chip">
+                <span>Average Temp</span>
+                <strong>{{ stats.avg_temp if stats.avg_temp is not none else "N/A" }}</strong>
+            </div>
+            <div class="stat-chip">
+                <span>Max Temp</span>
+                <strong>{{ stats.max_temp if stats.max_temp is not none else "N/A" }}</strong>
+            </div>
+            <div class="stat-chip">
+                <span>Min Temp</span>
+                <strong>{{ stats.min_temp if stats.min_temp is not none else "N/A" }}</strong>
+            </div>
+            <div class="stat-chip">
+                <span>Avg Humidity</span>
+                <strong>{{ stats.avg_humidity if stats.avg_humidity is not none else "N/A" }}</strong>
+            </div>
+            <div class="stat-chip">
+                <span>Trend</span>
+                <strong class="trend {{ stats.temp_trend }}">{{ stats.temp_trend|title }}</strong>
+            </div>
+            <div class="stat-chip">
+                <span>Common Condition</span>
+                <strong>{{ common_condition }}</strong>
+            </div>
+        </div>
+
+        <div class="anomaly-box">
+            <h3>Anomalies</h3>
+            {% if anomalies %}
+            <ul class="anomaly-list">
+                {% for anomaly in anomalies %}
+                <li>{{ anomaly.display_timestamp }}: {{ anomaly.temperature }} C</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="muted">No temperature anomalies detected yet.</p>
+            {% endif %}
+        </div>
+    </article>
+</section>
+
+<section class="chart-grid">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Temperature Trend</p>
+                <h2>Last 7 Days</h2>
+            </div>
+        </div>
+        {% if chart_payload.has_data %}
+        <canvas id="temperatureChart" data-city="{{ city }}"></canvas>
+        {% else %}
+        <div class="empty-state compact">
+            <p>No temperature history yet. Use the search form to store weather records.</p>
+        </div>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Humidity Levels</p>
+                <h2>Last 7 Days</h2>
+            </div>
+        </div>
+        {% if chart_payload.has_data %}
+        <canvas id="humidityChart" data-city="{{ city }}"></canvas>
+        {% else %}
+        <div class="empty-state compact">
+            <p>No humidity history yet. Stored readings will appear here automatically.</p>
+        </div>
+        {% endif %}
+    </article>
+</section>
+
+
+{% endblock %}

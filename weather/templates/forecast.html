@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Forecast | Weather Analyzer{% endblock %}
+
+{% block content %}
+<section class="hero-grid forecast-grid">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Prediction</p>
+                <h2>{{ city }} 24-Hour Forecast</h2>
+            </div>
+        </div>
+
+        <div class="card-grid single-row">
+            <div class="metric-card">
+                <span>Predicted Temp</span>
+                <strong>
+                    {% if prediction.predicted_temperature is not none %}
+                    {{ prediction.predicted_temperature }} C
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </strong>
+            </div>
+            <div class="metric-card wide">
+                <span>Confidence Note</span>
+                <strong class="note">{{ prediction.confidence_note }}</strong>
+            </div>
+        </div>
+
+        {% if forecast_labels %}
+        <canvas id="forecastChart"></canvas>
+        {% else %}
+        <div class="empty-state compact">
+            <p>Collect at least two historical records for {{ city }} to build a forecast.</p>
+        </div>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Model Input</p>
+                <h2>Recent Historical Data</h2>
+            </div>
+        </div>
+
+        {% if history_records %}
+        <div class="mini-list">
+            {% for record in history_records[-6:] %}
+            <div class="mini-list-item">
+                <span>{{ record.display_timestamp }}</span>
+                <strong>{{ "%.1f"|format(record.temperature) }} C</strong>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state compact">
+            <p>No stored records are available yet for this city.</p>
+        </div>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.weatherCharts = window.weatherCharts || {};
+    window.weatherCharts.forecast = {
+        historyLabels: {{ history_labels|tojson }},
+        historyTemps: {{ history_temps|tojson }},
+        forecastLabels: {{ forecast_labels|tojson }},
+        forecastTemps: {{ forecast_temps|tojson }}
+    };
+</script>
+{% endblock %}
