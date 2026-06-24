@@ -61,9 +61,7 @@ Deliverable: A .sql file containing the DDL (table creation) and the analytical 
 - `BookID` → `Books(BookID)` 
 
 
-### Steps
-
-**Option A — MySQL CLI**
+**MySQL CLI**
 ```bash
 # Log in to MySQL
 mysql -u root -p
