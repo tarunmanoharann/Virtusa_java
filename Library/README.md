@@ -69,3 +69,5 @@ mysql -u root -p
 # Run the script
 mysql -u root -p < dilib.sql
 ```
+
+pwd : tarun
